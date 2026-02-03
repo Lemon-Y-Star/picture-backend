@@ -7,12 +7,12 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
- * @description : 登录用户响应
+ * @description : 用户信息
  * @Author : lemon
  * @create 2026/2/1 17:28
  */
 @Data
-public class LoginUserResponse implements Serializable {
+public class UserResponse implements Serializable {
 
     @Serial
     private static final long serialVersionUID = -2913444153811392316L;

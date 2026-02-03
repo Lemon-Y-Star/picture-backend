@@ -1,6 +1,6 @@
 package com.lemon.pictruebackend.exception;
 
-import org.apache.commons.lang3.StringUtils;
+import cn.hutool.core.util.StrUtil;
 import org.springframework.util.CollectionUtils;
 
 import java.util.Collection;
@@ -52,7 +52,7 @@ public class AssertUtils {
      * @throws BusinessException 当传入的字符串为null或空字符串时抛出
      */
     public static void isNotBlank(String condition, ErrorCode errorCode) {
-        isTrue(!StringUtils.isBlank(condition), new BusinessException(errorCode));
+        isTrue(!StrUtil.isBlank(condition), new BusinessException(errorCode));
     }
 
     /**
@@ -63,7 +63,7 @@ public class AssertUtils {
      * @throws BusinessException 当传入的字符串为null或空字符串时抛出
      */
     public static void isNotBlank(String condition, ErrorCode errorCode, String message) {
-        isTrue(!StringUtils.isBlank(condition), new BusinessException(errorCode, message));
+        isTrue(!StrUtil.isBlank(condition), new BusinessException(errorCode, message));
     }
 
     /**
@@ -122,7 +122,7 @@ public class AssertUtils {
      * @throws BusinessException 当字符串不为空白时抛出的业务异常
      */
     public static void isBlank(String str, ErrorCode errorCode) {
-        isTrue(StringUtils.isBlank(str), new BusinessException(errorCode));
+        isTrue(StrUtil.isBlank(str), new BusinessException(errorCode));
     }
 
     /**
@@ -133,7 +133,7 @@ public class AssertUtils {
      * @throws BusinessException 当字符串不为空白时抛出的业务异常
      */
     public static void isBlank(String str, ErrorCode errorCode, String message) {
-        isTrue(StringUtils.isBlank(str), new BusinessException(errorCode, message));
+        isTrue(StrUtil.isBlank(str), new BusinessException(errorCode, message));
     }
 
     /**

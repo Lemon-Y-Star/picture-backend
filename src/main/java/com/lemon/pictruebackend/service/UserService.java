@@ -1,8 +1,13 @@
 package com.lemon.pictruebackend.service;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.lemon.pictruebackend.common.BasePageResponse;
 import com.lemon.pictruebackend.model.domain.User;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.lemon.pictruebackend.model.user.response.LoginUserResponse;
+import com.lemon.pictruebackend.model.user.request.UserAddRequest;
+import com.lemon.pictruebackend.model.user.request.UserQueryRequest;
+import com.lemon.pictruebackend.model.user.request.UserUpdateRequest;
+import com.lemon.pictruebackend.model.user.response.UserResponse;
 import jakarta.servlet.http.HttpServletRequest;
 
 /**
@@ -37,7 +42,7 @@ public interface UserService extends IService<User> {
      * @param request       请求
      * @return 脱敏后的用户信息
      */
-    LoginUserResponse userLogin(String userAccount, String userPassword, HttpServletRequest request);
+    UserResponse userLogin(String userAccount, String userPassword, HttpServletRequest request);
 
     /**
      * 获取当前登录用户
@@ -45,7 +50,7 @@ public interface UserService extends IService<User> {
      * @param request 请求
      * @return 当前登录用户
      */
-    LoginUserResponse getLoginUser(HttpServletRequest request);
+    UserResponse getLoginUser(HttpServletRequest request);
 
     /**
      * 用户注销
@@ -55,5 +60,38 @@ public interface UserService extends IService<User> {
      */
     boolean userLogout(HttpServletRequest request);
 
+    /**
+     * 获取查询条件
+     * @param userQueryRequest 查询请求
+     * @return 查询条件
+     */
+    QueryWrapper<User> getQueryWrapper(UserQueryRequest userQueryRequest);
+
+    /**
+     * 添加用户
+     * @param userAddRequest 添加用户请求
+     */
+    Long addUser(UserAddRequest userAddRequest);
+
+    /**
+     * 根据id查询用户
+     * @param id  用户id
+     * @return 用户信息
+     */
+    UserResponse getUserById(Long id);
+
+    /**
+     * 更新用户
+     * @param request 更新用户请求
+     * @return 是否更新成功
+     */
+    boolean updateUser(UserUpdateRequest request);
+
+    /**
+     * 分页查询用户
+     * @param request 查询请求
+     * @return 用户列表
+     */
+    BasePageResponse<UserResponse> listUserByPage(UserQueryRequest request);
 
 }

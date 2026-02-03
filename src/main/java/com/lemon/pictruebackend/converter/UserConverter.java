@@ -1,7 +1,9 @@
 package com.lemon.pictruebackend.converter;
 
 import com.lemon.pictruebackend.model.domain.User;
-import com.lemon.pictruebackend.model.user.response.LoginUserResponse;
+import com.lemon.pictruebackend.model.user.request.UserAddRequest;
+import com.lemon.pictruebackend.model.user.request.UserUpdateRequest;
+import com.lemon.pictruebackend.model.user.response.UserResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
@@ -16,7 +18,11 @@ import java.util.List;
 public interface UserConverter {
     UserConverter INSTANCE = Mappers.getMapper(UserConverter.class);
 
-    LoginUserResponse toResp(User user);
+    UserResponse toResp(User user);
 
-    List<LoginUserResponse> toRespList(List<User> user);
+    List<UserResponse> toRespList(List<User> user);
+
+    User toUser(UserAddRequest userAddRequest);
+
+    User toUser(UserUpdateRequest request);
 }

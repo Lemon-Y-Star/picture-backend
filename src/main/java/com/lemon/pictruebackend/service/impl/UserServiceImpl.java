@@ -1,18 +1,27 @@
 package com.lemon.pictruebackend.service.impl;
 
+import cn.hutool.core.util.ObjUtil;
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.lemon.pictruebackend.common.BasePageResponse;
+import com.lemon.pictruebackend.common.Constants;
 import com.lemon.pictruebackend.converter.UserConverter;
 import com.lemon.pictruebackend.exception.AssertUtils;
 import com.lemon.pictruebackend.exception.ErrorCode;
 import com.lemon.pictruebackend.model.domain.User;
 import com.lemon.pictruebackend.model.enums.UserRoleEnum;
-import com.lemon.pictruebackend.model.user.response.LoginUserResponse;
+import com.lemon.pictruebackend.model.user.request.UserAddRequest;
+import com.lemon.pictruebackend.model.user.request.UserQueryRequest;
+import com.lemon.pictruebackend.model.user.request.UserUpdateRequest;
+import com.lemon.pictruebackend.model.user.response.UserResponse;
 import com.lemon.pictruebackend.service.UserService;
-import com.lemon.pictruebackend.mapper.UserMapper;
+import com.lemon.pictruebackend.dal.UserMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
+
 
 import static com.lemon.pictruebackend.common.Constants.USER_LOGIN_STATE;
 
@@ -24,6 +33,12 @@ import static com.lemon.pictruebackend.common.Constants.USER_LOGIN_STATE;
 @Service
 public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         implements UserService {
+
+    private final UserService userService;
+
+    public UserServiceImpl(UserService userService) {
+        this.userService = userService;
+    }
 
     @Override
     public long userRegister(String userAccount, String userPassword, String checkPassword) {
@@ -59,13 +74,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
 
     @Override
     public String getEncryptPassword(String userPassword) {
-        // 盐值，混淆密码
-        final String SALT = "yyj";
-        return DigestUtils.md5DigestAsHex((SALT + userPassword).getBytes());
+        return DigestUtils.md5DigestAsHex((Constants.SALT + userPassword).getBytes());
     }
 
     @Override
-    public LoginUserResponse userLogin(String userAccount, String userPassword, HttpServletRequest request) {
+    public UserResponse userLogin(String userAccount, String userPassword, HttpServletRequest request) {
         // 1. 校验
         AssertUtils.isNotBlank(userAccount, ErrorCode.PARAMS_ERROR, "参数为空");
         AssertUtils.isNotBlank(userPassword, ErrorCode.PARAMS_ERROR, "参数为空");
@@ -89,7 +102,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
     }
 
     @Override
-    public LoginUserResponse getLoginUser(HttpServletRequest request) {
+    public UserResponse getLoginUser(HttpServletRequest request) {
         // 先判断是否已登录
         Object userObj = request.getSession().getAttribute(USER_LOGIN_STATE);
         User currentUser = (User) userObj;
@@ -118,6 +131,61 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         request.getSession().removeAttribute(USER_LOGIN_STATE);
         return true;
     }
+
+
+    public QueryWrapper<User> getQueryWrapper(UserQueryRequest userQueryRequest) {
+        AssertUtils.isNotNull(userQueryRequest, ErrorCode.PARAMS_ERROR);
+        Long id = userQueryRequest.getId();
+        String userAccount = userQueryRequest.getUserAccount();
+        String userName = userQueryRequest.getUserName();
+        String userProfile = userQueryRequest.getUserProfile();
+        String userRole = userQueryRequest.getUserRole();
+        String sortField = userQueryRequest.getSortField();
+        String sortOrder = userQueryRequest.getSortOrder();
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq(ObjUtil.isNotNull(id), "id", id);
+        queryWrapper.eq(StrUtil.isNotBlank(userRole), "userRole", userRole);
+        queryWrapper.like(StrUtil.isNotBlank(userAccount), "userAccount", userAccount);
+        queryWrapper.like(StrUtil.isNotBlank(userName), "userName", userName);
+        queryWrapper.like(StrUtil.isNotBlank(userProfile), "userProfile", userProfile);
+        queryWrapper.orderBy(StrUtil.isNotEmpty(sortField), sortOrder.equals("ascend"), sortField);
+        return queryWrapper;
+    }
+
+    @Override
+    public Long addUser(UserAddRequest userAddRequest) {
+        User user = UserConverter.INSTANCE.toUser(userAddRequest);
+        String encryptPassword = getEncryptPassword(Constants.DEFAULT_PASSWORD);
+        user.setUserPassword(encryptPassword);
+        boolean result = save(user);
+        AssertUtils.isTrue(result, ErrorCode.OPERATION_ERROR);
+        return user.getId();
+    }
+
+    @Override
+    public UserResponse getUserById(Long id) {
+        User user = getById(id);
+        AssertUtils.isNotNull(user, ErrorCode.NOT_FOUND_ERROR, "用户不存在");
+        return UserConverter.INSTANCE.toResp(user);
+    }
+
+    @Override
+    public boolean updateUser(UserUpdateRequest request) {
+        User user = UserConverter.INSTANCE.toUser(request);
+        return updateById(user);
+    }
+
+    @Override
+    public BasePageResponse<UserResponse> listUserByPage(UserQueryRequest request) {
+        long current = request.getCurrent();
+        long size = request.getPageSize();
+        QueryWrapper<User> queryWrapper = getQueryWrapper(request);
+        Page<User> page = userService.page(new Page<>(current, size), queryWrapper);
+        return new BasePageResponse<>(request.getCurrent(), request.getPageSize(),
+                page.getTotal(), UserConverter.INSTANCE.toRespList(page.getRecords()));
+    }
+
+
 
 
 }

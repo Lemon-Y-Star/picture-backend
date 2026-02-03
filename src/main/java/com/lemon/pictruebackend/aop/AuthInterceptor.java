@@ -4,7 +4,7 @@ import com.lemon.pictruebackend.annotation.AuthCheck;
 import com.lemon.pictruebackend.exception.AssertUtils;
 import com.lemon.pictruebackend.exception.ErrorCode;
 import com.lemon.pictruebackend.model.enums.UserRoleEnum;
-import com.lemon.pictruebackend.model.user.response.LoginUserResponse;
+import com.lemon.pictruebackend.model.user.response.UserResponse;
 import com.lemon.pictruebackend.service.UserService;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
@@ -40,7 +40,7 @@ public class AuthInterceptor {
         RequestAttributes requestAttributes = RequestContextHolder.currentRequestAttributes();
         HttpServletRequest request = ((ServletRequestAttributes) requestAttributes).getRequest();
         // 当前登录用户
-        LoginUserResponse loginUser = userService.getLoginUser(request);
+        UserResponse loginUser = userService.getLoginUser(request);
         UserRoleEnum mustRoleEnum = UserRoleEnum.getEnumByValue(mustRole);
         // 不需要权限，放行
         if (mustRoleEnum == null) {

@@ -1,4 +1,4 @@
-package com.lemon.pictruebackend.mapper;
+package com.lemon.pictruebackend.dal;
 
 import com.lemon.pictruebackend.model.domain.User;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;

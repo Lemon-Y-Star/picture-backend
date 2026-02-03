@@ -11,8 +11,6 @@ public interface Constants {
      */
     String USER_LOGIN_STATE = "user_login";
 
-    //  region 权限
-
     /**
      * 默认角色
      */
@@ -23,5 +21,14 @@ public interface Constants {
      */
     String ADMIN_ROLE = "admin";
 
+    /**
+     * 默认密码
+     */
+    String DEFAULT_PASSWORD = "12345678";
+
+    /**
+     * 默认盐值
+     */
+    String SALT = "yyj";
 }
 
